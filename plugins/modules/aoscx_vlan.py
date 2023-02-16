@@ -189,7 +189,7 @@ def main():
                 vlan.mgmd_enable['igmp'] = False
 
             vlan.apply()
-	    modified |= vlan.was_modified()
+            modified |= vlan.was_modified()
 
             # Changed
             result["changed"] = modified
