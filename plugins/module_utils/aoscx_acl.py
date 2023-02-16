@@ -12,10 +12,6 @@ __metaclass__ = type
 
 from random import randint
 
-from ansible_collections.arubanetworks.aoscx.plugins.module_utils.aoscx import (  # NOQA
-    ArubaAnsibleModule,
-)
-
 
 class ACL:
     def create_acl(self, aruba_ansible_module, acl_name, acl_type):

@@ -10,11 +10,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.arubanetworks.aoscx.plugins.module_utils.aoscx import (  # NOQA
-    ArubaAnsibleModule,
-)
-
-
 class VRF:
     def create_vrf(self, aruba_ansible_module, vrf_name):
 
