@@ -10,11 +10,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.arubanetworks.aoscx.plugins.module_utils.aoscx import (  # NOQA
-    ArubaAnsibleModule,
-)
-
-
 class Port:
     def create_port(self, aruba_ansible_module, port_name):
 

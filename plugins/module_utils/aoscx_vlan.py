@@ -10,9 +10,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.arubanetworks.aoscx.plugins.module_utils.aoscx import (  # NOQA
-    ArubaAnsibleModule,
-)
 from ansible_collections.arubanetworks.aoscx.plugins.module_utils.aoscx_port import (  # NOQA
     Port,
 )
