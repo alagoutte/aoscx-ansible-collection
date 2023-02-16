@@ -159,7 +159,7 @@ def main():
             if vsx_sync is True:
                 vlan.vsx_sync = ["all_attributes_and_dependents"]
             else:
-                vlan.vsx_sync = ""
+                vlan.vsx_sync = []
 
             vlan.apply()
 
