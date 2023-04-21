@@ -45,6 +45,21 @@ options:
       - up
       - down
     type: str
+  voice:
+    description: Enable Voice VLAN
+    required: false
+    default: false
+    type: bool
+  vsx_sync:
+    description: Enable vsx_sync (Only for VSX device)
+    required: false
+    default: false
+    type: bool
+  ip_igmp_snooping:
+    description: Enable IP IGMP Snooping
+    required: false
+    default: false
+    type: bool
   state:
     description: Create or update or delete the VLAN.
     required: false
@@ -67,6 +82,14 @@ EXAMPLES = """
     vlan_id: 300
     name: UPLINK_VLAN
     description: This is VLAN 300
+
+- name: Create VLAN 400 with name, voice, vsx_sync and ip igmp snooping
+  aoscx_vlan:
+    vlan_id: 400
+    name: VOICE_VLAN
+    voice: True
+    vsx_sync: True
+    ip_igmp_snooping: True
 
 - name: Delete VLAN 300
   aoscx_vlan:
@@ -103,6 +126,9 @@ def main():
         name=dict(type="str", default=None),
         description=dict(type="str", default=None),
         admin_state=dict(type="str", default=None, choices=["up", "down"]),
+        voice=dict(type='bool', required=False, default=False),
+        vsx_sync=dict(type='bool', required=False, default=False),
+        ip_igmp_snooping=dict(type='bool', required=False, default=False),
         state=dict(
             type="str",
             default="create",
@@ -121,6 +147,9 @@ def main():
             vlan_name = "VLAN{0}".format(vlan_id)
         description = ansible_module.params["description"]
         admin_state = ansible_module.params["admin_state"]
+        voice = ansible_module.params["voice"]
+        vsx_sync = ansible_module.params["vsx_sync"]
+        ip_igmp_snooping = ansible_module.params["ip_igmp_snooping"]
         state = ansible_module.params["state"]
 
         result = dict(changed=False)
@@ -145,10 +174,25 @@ def main():
             vlan = device.vlan(
                 vlan_id, vlan_name, description, "static", admin_state
             )
+            modified = vlan.was_modified()
 
-            if vlan.was_modified():
-                # Changed
-                result["changed"] = True
+            # Update Voice, vsx_sync... parameters
+            vlan.voice = voice
+            if vsx_sync is True:
+                vlan.vsx_sync = ["all_attributes_and_dependents"]
+            else:
+                vlan.vsx_sync = []
+
+            if ip_igmp_snooping is True:
+                vlan.mgmd_enable['igmp'] = True
+            else:
+                vlan.mgmd_enable['igmp'] = False
+
+            vlan.apply()
+            modified |= vlan.was_modified()
+
+            # Changed
+            result["changed"] = modified
 
         # Exit
         ansible_module.exit_json(**result)
