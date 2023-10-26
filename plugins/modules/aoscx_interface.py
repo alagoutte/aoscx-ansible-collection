@@ -418,6 +418,11 @@ def get_argument_spec():
                 },
             },
         },
+        "persona": {
+            "type": "str",
+            "required": False,
+            "default": None,
+        },
         "state": {
             "type": "str",
             "required": False,
@@ -504,6 +509,8 @@ def main():
     duplex = ansible_module.params["duplex"]
     speeds = ansible_module.params["speeds"]
 
+    persona = ansible_module.params["persona"]
+
     session = get_pyaoscx_session(ansible_module)
     device = Device(session)
 
@@ -563,6 +570,9 @@ def main():
             vsx_sync_features_mapping(feature) for feature in vsx_sync
         ]
         interface.vsx_sync = clean_vsx_features
+
+    if persona:
+        interface.persona = persona
 
     modified |= interface.apply()
 
