@@ -47,6 +47,7 @@ options:
       - software_images
       - software_info
       - software_version
+      - none
     required: false
     default:
       - domain_name
@@ -203,6 +204,7 @@ def main():
                 "software_images",
                 "software_info",
                 "software_version",
+                "none"
             ],
         ),
         "gather_network_resources": dict(
@@ -279,6 +281,15 @@ def main():
 
     # Retrieve ansible_net_gather_subset
     ansible_facts.update({"ansible_net_gather_subset": subset_list})
+
+    warnings.append("toto {0}".format(type(ansible_module.params["gather_subset"])))
+
+    if "none" in ansible_module.params["gather_subset"]:
+        warnings.append(
+            "default value for `gather_subset` will be changed "
+            "to `min` from `!config` v2.11 onwards "
+        )
+        ansible_module.exit_json(ansible_facts=ansible_facts, warnings=warnings)
 
     try:
         switch = Device(session)
