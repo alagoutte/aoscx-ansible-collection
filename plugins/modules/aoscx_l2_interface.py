@@ -434,6 +434,21 @@ def get_argument_spec():
             "required": False,
             "default": None,
         },
+        "stp_admin_edge_port_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
+        "stp_bpdu_filter_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
+        "stp_bpdu_guard_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
     }
     return module_args
 
@@ -474,6 +489,9 @@ def main():
     port_security_recovery_time = ansible_module.params[
         "port_security_recovery_time"
     ]
+    stp_admin_edge_port_enable = ansible_module.params["stp_admin_edge_port_enable"]
+    stp_bpdu_filter_enable = ansible_module.params["stp_bpdu_filter_enable"]
+    stp_bpdu_guard_enable = ansible_module.params["stp_bpdu_guard_enable"]
 
     try:
         from pyaoscx.device import Device
@@ -660,6 +678,17 @@ def main():
             ansible_module.fail_json(msg=str(exc))
 
         modified_op |= _result
+
+    #Spanning Tree
+    try:
+        modified_op = interface.configure_spanning_tree(
+            admin_edge_port_enable=stp_admin_edge_port_enable,
+            bpdu_filter_enable=stp_bpdu_filter_enable,
+            bpdu_guard_enable=stp_bpdu_guard_enable,
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
+
     if modified_op:
         result["changed"] = True
 
