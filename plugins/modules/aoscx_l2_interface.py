@@ -745,15 +745,15 @@ def main():
 
         modified_op |= _result
 
-    #Spanning Tree
+    # Spanning Tree
     try:
         modified_op = interface.configure_spanning_tree(
             admin_edge_port_enable=stp_admin_edge_port_enable,
             bpdu_filter_enable=stp_bpdu_filter_enable,
             bpdu_guard_enable=stp_bpdu_guard_enable,
-            link_type = stp_link_type,
-            loop_guard_enable = stp_loop_guard_enable,
-            root_guard_enable = stp_root_guard_enable
+            link_type=stp_link_type,
+            loop_guard_enable=stp_loop_guard_enable,
+            root_guard_enable=stp_root_guard_enable
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
