@@ -151,6 +151,41 @@ options:
       connection). Only valid when port_security is enabled.
     type: int
     required: false
+  stp_admin_edge_port_enable:
+    description: >
+      Boolean to set admin type: admin-edge or admin-network (default)
+    type: bool
+    required: false
+  stp_bpdu_filter_enable:
+    description: >
+      Boolean to set BPDU filter (disable by default)
+    type: bool
+    required: false
+  stp_bpdu_guard_enable:
+    description: >
+      Boolean to set BPDU guard (disable by default)
+    type: bool
+    required: false
+  stp_link_type:
+    description: >
+      String to set link-type
+    type: bool
+    choices:
+      - auto
+      - point_to_point
+      - shared
+    default: auto
+    required: false
+  stp_loop_guard_enable:
+    description: >
+      Boolean to set Loop guard (disable by default)
+    type: bool
+    required: false
+  stp_root_guard_enable:
+    description: >
+      Boolean to set Root guard (disable by default)
+    type: bool
+    required: false
 """
 
 EXAMPLES = """
