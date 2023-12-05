@@ -353,6 +353,18 @@ EXAMPLES = """
     vlan_mode: trunk
     trunk_allowed_all: true
     native_vlan_id: '200'
+
+- name: >
+    Configure Interface 1/1/7 - Enable Spanning tree on the port (admin_edge_port,
+      bpdu_filter/guard, loop/root guard and link_type).
+  aoscx_l2_interface:
+    interface: 1/1/7
+    stp_admin_edge_port_enable: true
+    stp_bpdu_filter_enable: true
+    stp_bpdu_guard_enable: true
+    stp_link_type: "point_to_point"
+    stp_loop_guard_enable: true
+    stp_root_guard_enable: true
 """
 
 RETURN = r""" # """
