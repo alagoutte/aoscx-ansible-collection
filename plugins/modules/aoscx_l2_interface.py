@@ -169,7 +169,7 @@ options:
   stp_link_type:
     description: >
       String to set link-type
-    type: bool
+    type: str
     choices:
       - auto
       - point_to_point
