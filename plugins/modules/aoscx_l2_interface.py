@@ -449,6 +449,22 @@ def get_argument_spec():
             "required": False,
             "default": None,
         },
+        "stp_link_type": {
+            "type": "str",
+            "required": False,
+            "default": "auto",
+            "choices": ["auto", "point_to_point", "shared"]
+        },
+        "stp_loop_guard_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
+        "stp_root_guard_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
     }
     return module_args
 
@@ -492,6 +508,9 @@ def main():
     stp_admin_edge_port_enable = ansible_module.params["stp_admin_edge_port_enable"]
     stp_bpdu_filter_enable = ansible_module.params["stp_bpdu_filter_enable"]
     stp_bpdu_guard_enable = ansible_module.params["stp_bpdu_guard_enable"]
+    stp_link_type = ansible_module.params["stp_link_type"]
+    stp_loop_guard_enable = ansible_module.params["stp_loop_guard_enable"]
+    stp_root_guard_enable = ansible_module.params["stp_root_guard_enable"]
 
     try:
         from pyaoscx.device import Device
@@ -685,6 +704,9 @@ def main():
             admin_edge_port_enable=stp_admin_edge_port_enable,
             bpdu_filter_enable=stp_bpdu_filter_enable,
             bpdu_guard_enable=stp_bpdu_guard_enable,
+            link_type = stp_link_type,
+            loop_guard_enable = stp_loop_guard_enable,
+            root_guard_enable = stp_root_guard_enable
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
