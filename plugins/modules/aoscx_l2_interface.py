@@ -512,6 +512,16 @@ def get_argument_spec():
             "required": False,
             "default": None,
         },
+        "loop_protect_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
+        "loop_protect_action": {
+            "type": "str",
+            "required": False,
+            "choices": ["do-not-disable", "tx-disable", "tx-rx-disable"]
+        },
     }
     return module_args
 
@@ -558,6 +568,8 @@ def main():
     stp_link_type = ansible_module.params["stp_link_type"]
     stp_loop_guard_enable = ansible_module.params["stp_loop_guard_enable"]
     stp_root_guard_enable = ansible_module.params["stp_root_guard_enable"]
+    loop_protect_enable = ansible_module.params["loop_protect_enable"]
+    loop_protect_action = ansible_module.params["loop_protect_action"]
 
     try:
         from pyaoscx.device import Device
@@ -754,6 +766,15 @@ def main():
             link_type=stp_link_type,
             loop_guard_enable=stp_loop_guard_enable,
             root_guard_enable=stp_root_guard_enable
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
+
+    # Loop Protect
+    try:
+        modified_op = interface.configure_loop_protect(
+            loop_protect_enable=loop_protect_enable,
+            loop_protect_action=loop_protect_action
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
