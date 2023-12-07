@@ -378,6 +378,14 @@ EXAMPLES = """
     stp_link_type: "point_to_point"
     stp_loop_guard_enable: true
     stp_root_guard_enable: true
+
+- name: >
+    Configure Interface 1/1/8 - Enable Loop Protect with action dot not disable
+      on the port
+  aoscx_l2_interface:
+    interface: 1/1/8
+    loop_protect_enable: true
+    loop_protect_action: do-not-disable
 """
 
 RETURN = r""" # """
