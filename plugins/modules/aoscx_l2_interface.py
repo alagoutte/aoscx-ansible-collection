@@ -186,6 +186,19 @@ options:
       Boolean to set Root guard (disable by default)
     type: bool
     required: false
+  loop_protect_enable:
+    description: >
+      Boolean to set enable Loop Protect (disable by default)
+    type: bool
+    required: false
+  loop_protect_action:
+    description: >
+      String to set Loop Protect Action
+    type: str
+    choices:
+      - do-not-disable
+      - tx-disable
+      - tx-rx-disable
 """
 
 EXAMPLES = """
