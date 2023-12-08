@@ -195,6 +195,20 @@ options:
       - update
       - delete
     required: false
+  lldp_enable_dir:
+    description: >
+      Option to configure LLDP interface level config
+    type: str
+    choices:
+      - tx
+      - rx
+      - tx
+      - rxtx
+  lldp_trap_enable:
+    description: >
+      Enables the transmission of SNMP traps for LLDP neighbor changes on this
+      interface.
+    type: bool
 """
 
 EXAMPLES = """
@@ -300,6 +314,12 @@ EXAMPLES = """
   aoscx_interface:
     name: 1/1/17
     mtu: 1300
+
+- name: Configure Interface 1/1/2 - LLDP (rx only and disable trap)
+  aoscx_interface:
+    name: 1/1/17
+    lldp_enable_dir: rx
+    lldp_trap_enable: false
 """
 
 RETURN = r""" # """
@@ -455,6 +475,15 @@ def get_argument_spec():
             "default": "create",
             "choices": ["create", "update", "delete"],
         },
+        "lldp_enable_dir": {
+            "type": "str",
+            "required": False,
+            "choices": ["off", "rx", "tx", "rxtx"],
+        },
+        "lldp_trap_enable": {
+            "type": "bool",
+            "required": False,
+        },
     }
     return argument_spec
 
@@ -538,6 +567,9 @@ def main():
     autoneg = ansible_module.params["autoneg"]
     duplex = ansible_module.params["duplex"]
     speeds = ansible_module.params["speeds"]
+
+    lldp_enable_dir = ansible_module.params["lldp_enable_dir"]
+    lldp_trap_enable = ansible_module.params["lldp_trap_enable"]
 
     session = get_pyaoscx_session(ansible_module)
     device = Device(session)
@@ -687,6 +719,15 @@ def main():
             _unknown_unicast = qos_rate.pop("unknown_unicast")
             qos_rate["unknown-unicast"] = _unknown_unicast
         modified |= interface.update_interface_qos_rate(qos_rate)
+
+    # LLDP
+    try:
+        modified |= interface.configure_lldp(
+            lldp_enable_dir=lldp_enable_dir,
+            lldp_trap_enable=lldp_trap_enable
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
 
     result["changed"] = modified
     ansible_module.exit_json(**result)
