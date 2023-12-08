@@ -174,7 +174,6 @@ options:
       - auto
       - point_to_point
       - shared
-    default: auto
     required: false
   stp_loop_guard_enable:
     description: >
@@ -520,7 +519,6 @@ def get_argument_spec():
         "stp_link_type": {
             "type": "str",
             "required": False,
-            "default": "auto",
             "choices": ["auto", "point_to_point", "shared"]
         },
         "stp_loop_guard_enable": {
