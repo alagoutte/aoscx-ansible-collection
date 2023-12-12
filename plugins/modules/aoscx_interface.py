@@ -209,6 +209,14 @@ options:
       Enables the transmission of SNMP traps for LLDP neighbor changes on this
       interface.
     type: bool
+  cdp_disable:
+    description: >
+      Disable the transmission of CDP packet on this interface.
+    type: bool
+  sflow_enabled:
+    description: >
+      Enable the transmission of sflow packet on this interface.
+    type: bool
 """
 
 EXAMPLES = """
@@ -484,6 +492,14 @@ def get_argument_spec():
             "type": "bool",
             "required": False,
         },
+        "cdp_disable": {
+            "type": "bool",
+            "required": False,
+        },
+        "sflow_enabled": {
+            "type": "bool",
+            "required": False,
+        },
     }
     return argument_spec
 
@@ -570,6 +586,9 @@ def main():
 
     lldp_enable_dir = ansible_module.params["lldp_enable_dir"]
     lldp_trap_enable = ansible_module.params["lldp_trap_enable"]
+
+    cdp_disable = ansible_module.params["cdp_disable"]
+    sflow_enabled = ansible_module.params["sflow_enabled"]
 
     session = get_pyaoscx_session(ansible_module)
     device = Device(session)
@@ -725,6 +744,15 @@ def main():
         modified |= interface.configure_lldp(
             lldp_enable_dir=lldp_enable_dir,
             lldp_trap_enable=lldp_trap_enable
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
+
+    # Options (sflow, cdp...)
+    try:
+        modified |= interface.configure_options(
+            cdp_disable=cdp_disable,
+            sflow_enabled=sflow_enabled
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
