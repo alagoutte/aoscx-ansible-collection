@@ -200,7 +200,7 @@ options:
       Option to configure LLDP interface level config
     type: str
     choices:
-      - tx
+      - 'off'
       - rx
       - tx
       - rxtx
