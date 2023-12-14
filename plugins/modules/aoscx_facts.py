@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (C) Copyright 2020-2022 Hewlett Packard Enterprise Development LP.
+# (C) Copyright 2020-2023 Hewlett Packard Enterprise Development LP.
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -63,15 +63,16 @@ options:
       - software_version
   gather_network_resources:
     description: >
-      Retrieve vlan, interface, or vrf information. This can be a single
-      category or it can be a list. Leaving this field blank returns all all
-      interfaces, vlans, and vrfs.
+      Retrieve vlan, interface, lldp_neighbors or vrf information. This can
+      be a single category or it can be a list. Leaving this field blank
+      returns all interfaces, vlans, and vrfs.
     type: list
     elements: str
     choices:
       - interfaces
       - vlans
       - vrfs
+      - lldp_neighbors
     required: false
 """
 
@@ -208,7 +209,7 @@ def main():
         "gather_network_resources": dict(
             type="list",
             elements="str",
-            choices=["interfaces", "vlans", "vrfs"],
+            choices=["interfaces", "vlans", "vrfs", "lldp_neighbors"],
         ),
     }
     ansible_module = AnsibleModule(
@@ -263,6 +264,13 @@ def main():
                     ansible_network_resources.update(
                         {"vrfs": Vrf.get_facts(session)}
                     )
+                elif resource == "lldp_neighbors":
+                    LLDPNeighbor = session.api.get_module_class(
+                        session, "LLDPNeighbor"
+                    )
+                    ansible_network_resources.update(
+                        {"lldp_neighbors": LLDPNeighbor.get_facts(session)}
+                    )
             except Exception as e:
                 ansible_module.fail_json(
                     msg="Network resources: {0}".format(str(e))
@@ -285,6 +293,33 @@ def main():
         switch.get()
     except Exception as e:
         ansible_module.fail_json(msg="System: {0}".format(str(e)))
+
+    # LLDP Neighbors for interface mgmt are located in System (switch)
+    if (
+        "lldp_neighbors" in ansible_network_resources
+        and switch.lldp_mgmt_neighbor_info
+    ):
+        mgmt_lldp_neighbors = {}
+        for neighbor in switch.lldp_mgmt_neighbor_info.values():
+            # Creating an entry similar to those obtained
+            # from LLDPNeighbor.get_facts()
+            tmp_chassis_id = neighbor.pop("chassis_id", "")
+            tmp_port_id = neighbor.pop("port_id", "")
+            tmp_mac_addr = neighbor.pop("mac_addr", "")
+            neighbor_idx = tmp_chassis_id + "," + tmp_port_id
+
+            mgmt_lldp_neighbors[neighbor_idx] = {}
+            mgmt_lldp_neighbors[neighbor_idx].update(
+                {
+                    "chassis_id": tmp_chassis_id,
+                    "port_id": tmp_port_id,
+                    "mac_addr": tmp_mac_addr,
+                    "neighbor_info": neighbor,
+                }
+            )
+        ansible_network_resources["lldp_neighbors"].update(
+            {"mgmt": mgmt_lldp_neighbors}
+        )
 
     curr_firmware = iter(switch.firmware_version.split("."))
     platform = next(curr_firmware)

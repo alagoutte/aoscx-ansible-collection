@@ -68,15 +68,16 @@ available yet, it will be available in a future release.
       - software_version
   gather_network_resources:
     description: >
-      Retrieve vlan, interface, or vrf information. This can be a single
-      category or it can be a list. Leaving this field blank returns all all
-      interfaces, vlans, and vrfs.
+      Retrieve vlan, interface, lldp_neighbors or vrf information. This can
+      be a single category or it can be a list. Leaving this field blank
+      returns all interfaces, vlans, and vrfs.
     type: list
     elements: str
     choices:
       - interfaces
       - vlans
       - vrfs
+      - lldp_neighbors
     required: false
 ```
 
