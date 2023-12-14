@@ -500,6 +500,10 @@ def get_argument_spec():
             "type": "bool",
             "required": False,
         },
+        "ip_mtu": {
+            "type": "int",
+            "required": False,
+        },
     }
     return argument_spec
 
@@ -589,6 +593,7 @@ def main():
 
     cdp_disable = ansible_module.params["cdp_disable"]
     sflow_enabled = ansible_module.params["sflow_enabled"]
+    ip_mtu = ansible_module.params["ip_mtu"]
 
     session = get_pyaoscx_session(ansible_module)
     device = Device(session)
@@ -752,7 +757,8 @@ def main():
     try:
         modified |= interface.configure_options(
             cdp_disable=cdp_disable,
-            sflow_enabled=sflow_enabled
+            sflow_enabled=sflow_enabled,
+            ip_mtu=ip_mtu
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
