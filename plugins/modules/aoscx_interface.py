@@ -217,6 +217,10 @@ options:
     description: >
       Enable the transmission of sflow packet on this interface.
     type: bool
+  ip_mtu:
+    description: Configure IP MTU (68 - 9198) value of the interface
+    type: int
+    required: false
 """
 
 EXAMPLES = """
