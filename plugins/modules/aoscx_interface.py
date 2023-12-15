@@ -327,7 +327,7 @@ EXAMPLES = """
     name: 1/1/17
     mtu: 1300
 
-- name: Configure Interface 1/1/2 - LLDP (rx only and disable trap)
+- name: Configure Interface 1/1/17 - LLDP (rx only and disable trap)
   aoscx_interface:
     name: 1/1/17
     lldp_enable_dir: rx
