@@ -198,6 +198,16 @@ options:
       - do-not-disable
       - tx-disable
       - tx-rx-disable
+  port_access_radius_override_enable:
+    description: >
+      Boolean to set enable Port Access RADIUS override (disable by default)
+    type: bool
+    required: false
+  port_access_clients_limit:
+    description: >
+      Int to set Port Access clients limit
+    type: int
+    required: false
 """
 
 EXAMPLES = """
@@ -385,6 +395,13 @@ EXAMPLES = """
     interface: 1/1/8
     loop_protect_enable: true
     loop_protect_action: do-not-disable
+
+- name: >
+    Configure Interface 1/1/9 - Configure Port Access (RADIUS override, client limit)
+  arubanetworks.aoscx.aoscx_l2_interface:
+    interface: 1/1/9
+    port_access_radius_override_enable: true
+    port_access_clients_limit: 2
 """
 
 RETURN = r""" # """
@@ -541,6 +558,15 @@ def get_argument_spec():
             "required": False,
             "choices": ["do-not-disable", "tx-disable", "tx-rx-disable"]
         },
+        "port_access_radius_override_enable": {
+            "type": "bool",
+            "required": False,
+            "default": None,
+        },
+        "port_access_clients_limit": {
+            "type": "int",
+            "required": False,
+        },
     }
     return module_args
 
@@ -589,6 +615,13 @@ def main():
     stp_root_guard_enable = ansible_module.params["stp_root_guard_enable"]
     loop_protect_enable = ansible_module.params["loop_protect_enable"]
     loop_protect_action = ansible_module.params["loop_protect_action"]
+
+    port_access_radius_override_enable = ansible_module.params[
+        "port_access_radius_override_enable"
+    ]
+    port_access_clients_limit = ansible_module.params[
+        "port_access_clients_limit"
+    ]
 
     try:
         from pyaoscx.device import Device
@@ -794,6 +827,16 @@ def main():
         modified_op = interface.configure_loop_protect(
             loop_protect_enable=loop_protect_enable,
             loop_protect_action=loop_protect_action
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
+
+    # Port Access
+    try:
+        modified_op = interface.configure_port_access(
+            port_access_radius_override_enable=\
+              port_access_radius_override_enable,
+            port_access_clients_limit=port_access_clients_limit
         )
     except Exception as e:
         ansible_module.fail_json(str(e))
