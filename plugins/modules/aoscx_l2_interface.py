@@ -811,7 +811,7 @@ def main():
 
     # Spanning Tree
     try:
-        modified_op = interface.configure_spanning_tree(
+        modified_op |= interface.configure_spanning_tree(
             admin_edge_port_enable=stp_admin_edge_port_enable,
             bpdu_filter_enable=stp_bpdu_filter_enable,
             bpdu_guard_enable=stp_bpdu_guard_enable,
@@ -824,7 +824,7 @@ def main():
 
     # Loop Protect
     try:
-        modified_op = interface.configure_loop_protect(
+        modified_op |= interface.configure_loop_protect(
             loop_protect_enable=loop_protect_enable,
             loop_protect_action=loop_protect_action
         )
@@ -833,7 +833,7 @@ def main():
 
     # Port Access
     try:
-        modified_op = interface.configure_port_access(
+        modified_op |= interface.configure_port_access(
             port_access_radius_override_enable=\
               port_access_radius_override_enable,
             port_access_clients_limit=port_access_clients_limit
