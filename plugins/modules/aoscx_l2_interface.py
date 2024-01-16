@@ -834,8 +834,7 @@ def main():
     # Port Access
     try:
         modified_op |= interface.configure_port_access(
-            port_access_radius_override_enable=
-              port_access_radius_override_enable,
+            port_access_radius_override_enable=port_access_radius_override_enable,
             port_access_clients_limit=port_access_clients_limit
         )
     except Exception as e:
