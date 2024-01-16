@@ -336,9 +336,9 @@ EXAMPLES = """
 - name: Configure Interface 1/1/9 - Options (cdpn, sflow, IP MTU...)
   aoscx_interface:
     name: 1/1/9
-      cdp_disable: true
-      sflow_enabled: false
-      ip_mtu: 9000
+    cdp_disable: true
+    sflow_enabled: false
+    ip_mtu: 9000
 """
 
 RETURN = r""" # """
