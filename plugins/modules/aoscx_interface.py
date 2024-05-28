@@ -195,6 +195,32 @@ options:
       - update
       - delete
     required: false
+  lldp_enable_dir:
+    description: >
+      Option to configure LLDP interface level config
+    type: str
+    choices:
+      - 'off'
+      - rx
+      - tx
+      - rxtx
+  lldp_trap_enable:
+    description: >
+      Enables the transmission of SNMP traps for LLDP neighbor changes on this
+      interface.
+    type: bool
+  cdp_disable:
+    description: >
+      Disable the transmission of CDP packet on this interface.
+    type: bool
+  sflow_enabled:
+    description: >
+      Enable the transmission of sflow packet on this interface.
+    type: bool
+  ip_mtu:
+    description: Configure IP MTU (68 - 9198) value of the interface
+    type: int
+    required: false
 """
 
 EXAMPLES = """
@@ -296,10 +322,23 @@ EXAMPLES = """
       - vlan
       - vsx_virtual
 
-- name: Set the MTU rate to the 1/1/1 Interface
+- name: Set the MTU rate to the 1/1/17 Interface
   aoscx_interface:
     name: 1/1/17
     mtu: 1300
+
+- name: Configure Interface 1/1/17 - LLDP (rx only and disable trap)
+  aoscx_interface:
+    name: 1/1/17
+    lldp_enable_dir: rx
+    lldp_trap_enable: false
+
+- name: Configure Interface 1/1/9 - Options (cdpn, sflow, IP MTU...)
+  aoscx_interface:
+    name: 1/1/9
+    cdp_disable: true
+    sflow_enabled: false
+    ip_mtu: 9000
 """
 
 RETURN = r""" # """
@@ -455,6 +494,27 @@ def get_argument_spec():
             "default": "create",
             "choices": ["create", "update", "delete"],
         },
+        "lldp_enable_dir": {
+            "type": "str",
+            "required": False,
+            "choices": ["off", "rx", "tx", "rxtx"],
+        },
+        "lldp_trap_enable": {
+            "type": "bool",
+            "required": False,
+        },
+        "cdp_disable": {
+            "type": "bool",
+            "required": False,
+        },
+        "sflow_enabled": {
+            "type": "bool",
+            "required": False,
+        },
+        "ip_mtu": {
+            "type": "int",
+            "required": False,
+        },
     }
     return argument_spec
 
@@ -538,6 +598,13 @@ def main():
     autoneg = ansible_module.params["autoneg"]
     duplex = ansible_module.params["duplex"]
     speeds = ansible_module.params["speeds"]
+
+    lldp_enable_dir = ansible_module.params["lldp_enable_dir"]
+    lldp_trap_enable = ansible_module.params["lldp_trap_enable"]
+
+    cdp_disable = ansible_module.params["cdp_disable"]
+    sflow_enabled = ansible_module.params["sflow_enabled"]
+    ip_mtu = ansible_module.params["ip_mtu"]
 
     session = get_pyaoscx_session(ansible_module)
     device = Device(session)
@@ -687,6 +754,25 @@ def main():
             _unknown_unicast = qos_rate.pop("unknown_unicast")
             qos_rate["unknown-unicast"] = _unknown_unicast
         modified |= interface.update_interface_qos_rate(qos_rate)
+
+    # LLDP
+    try:
+        modified |= interface.configure_lldp(
+            lldp_enable_dir=lldp_enable_dir,
+            lldp_trap_enable=lldp_trap_enable
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
+
+    # Options (sflow, cdp...)
+    try:
+        modified |= interface.configure_options(
+            cdp_disable=cdp_disable,
+            sflow_enabled=sflow_enabled,
+            ip_mtu=ip_mtu
+        )
+    except Exception as e:
+        ansible_module.fail_json(str(e))
 
     result["changed"] = modified
     ansible_module.exit_json(**result)
